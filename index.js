@@ -1,11 +1,10 @@
 "use strict";
 
 const request = require("request");
-const transform = require("stream-transform");
 const fs = require("fs");
 const natural = require("natural");
 // Naive Bayes algorithm
-const classifier = new natural.BayesClassifer();
+const classifier = new natural.BayesClassifier();
 // other classifier option is Logistic Regression algorithm
 // performs better than Bayes with a sufficiently large dataset
 // takes longer to train
@@ -17,28 +16,29 @@ let rawDataHomer = "http://www.gutenberg.org/cache/epub/6130/pg6130.txt";
 let training_data = [];
 let test_data = [];
 
-let transformer = transform(function (text) {
-	let sentences = text.split(".");
-
-	let data = sentences.map(sentence => {
-		return {text: sentence, label: "shakespeare"};
-	})
-	
-	return data;
-});
-
-const saveData = (url, filename, label) => {
+const saveData = (url, filename) => {
 	request
 	.get(url)
-	.on("response", (response) => {
-		console.log(response, "\n\n")
-	})
-	.pipe(transformer)
 	.pipe(fs.createWriteStream(filename));
 }
 
-saveData(rawDataShakespeare, "training_data.json", "shakespeare");
-
+const formatTrainingData = (filename, label) => {
+	fs.readFile(filename, "utf-8", (err, data) => {
+		if (err) {
+			console.log(err);
+		}
+		else {
+			let rawText = data;
+			let sentences = rawText.split(".");
+			let training_data = sentences.splice(-500, 500).map(sentence => {
+				let dataPoint = {text: sentence, label: label};
+				console.log(dataPoint);
+				return dataPoint;
+			});
+			// train(training_data);
+		}
+	});
+}
 
 const testClassifier = (test_data) => {
 	console.log("\ntesting data\n");
@@ -82,17 +82,14 @@ const train = (data) => {
 	let end_time = new Date();
 	let training_time = (end_time - start_time)/1000.0;
 	console.log("training time:", training_time, "seconds");
-	loadTestData();
+	// loadTestData();
 }
 
-// fs.readFile("training_data.json", "utf-8", (err, data) => {
-// 	if (err) {
-// 		console.log(err);
-// 	}
-// 	else {
-// 		let training_data = JSON.parse(data);
-// 		train(training_data);
-// 	}
-// })
+saveData(rawDataShakespeare, "shakespeare.txt");
+saveData(rawDataHomer, "homer.txt");
 
+formatTrainingData("shakespeare.txt", "shakespeare");
+formatTrainingData("homer.txt", "homer");
+
+loadTestData();
 
