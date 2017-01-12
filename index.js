@@ -1,13 +1,44 @@
 "use strict";
 
-const natural = require("natural");
+const request = require("request");
+const transform = require("stream-transform");
 const fs = require("fs");
+const natural = require("natural");
 // Naive Bayes algorithm
 const classifier = new natural.BayesClassifer();
 // other classifier option is Logistic Regression algorithm
 // performs better than Bayes with a sufficiently large dataset
 // takes longer to train
 // const classifier = new natural.LogisticRegressionClassifer();
+
+// Is it Romeo and Juliet, or is it the Iliad?
+let rawDataShakespeare = "http://www.gutenberg.org/cache/epub/1112/pg1112.txt";
+let rawDataHomer = "http://www.gutenberg.org/cache/epub/6130/pg6130.txt";
+let training_data = [];
+let test_data = [];
+
+let transformer = transform(function (text) {
+	let sentences = text.split(".");
+
+	let data = sentences.map(sentence => {
+		return {text: sentence, label: "shakespeare"};
+	})
+	
+	return data;
+});
+
+const saveData = (url, filename, label) => {
+	request
+	.get(url)
+	.on("response", (response) => {
+		console.log(response, "\n\n")
+	})
+	.pipe(transformer)
+	.pipe(fs.createWriteStream(filename));
+}
+
+saveData(rawDataShakespeare, "training_data.json", "shakespeare");
+
 
 const testClassifier = (test_data) => {
 	console.log("\ntesting data\n");
@@ -54,14 +85,14 @@ const train = (data) => {
 	loadTestData();
 }
 
-fs.readFile("training_data.json", "utf-8", (err, data) => {
-	if (err) {
-		console.log(err);
-	}
-	else {
-		let training_data = JSON.parse(data);
-		train(training_data);
-	}
-})
+// fs.readFile("training_data.json", "utf-8", (err, data) => {
+// 	if (err) {
+// 		console.log(err);
+// 	}
+// 	else {
+// 		let training_data = JSON.parse(data);
+// 		train(training_data);
+// 	}
+// })
 
 
