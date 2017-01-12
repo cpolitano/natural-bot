@@ -35,7 +35,7 @@ testData.forEach(datum => {
 	let guess = classifier.classify(datum.text);
 	console.log(datum.text, " - Guess:", guess);
 	console.log(classifier.getClassifications(datum.text));
-})
+});
 
 
 
