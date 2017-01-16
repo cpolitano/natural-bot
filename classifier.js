@@ -5,6 +5,11 @@ const natural = require("natural");
 // Naive Bayes Classifier
 const classifier = new natural.BayesClassifier();
 
+// other classifier option is Logistic Regression algorithm
+// performs better than Bayes with a sufficiently large dataset
+// takes longer to train
+// const classifier = new natural.LogisticRegressionClassifier();
+
 // divide data into training and test data
 // ~75% of data should be training, 25% test
 const trainingData = [
