@@ -18,6 +18,8 @@ const prepareData = (url, label) => {
 	return new Promise((resolve) => {
 		let counter = 0;
 
+		console.log("requesting", label);
+
 		request
 		.get(url)
 		.pipe(es.split())
@@ -60,6 +62,18 @@ const testClassifier = (test_data) => {
 	});
 
 	console.log("\ncorrect %:", numCorrect/test_data.length);
+	saveClassifier(classifier);
+}
+
+const saveClassifier = (classifier) => {
+	classifier.save("classifier.json", (err, classifier) => {
+		if (err) {
+			console.log(err);
+		}
+		else {
+			console.log("classifier saved");
+		}
+	})
 }
 
 const train = (data) => {
