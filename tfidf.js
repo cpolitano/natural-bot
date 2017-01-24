@@ -30,4 +30,20 @@ tfidf.tfidfs("love spirit bridge", (docIndex, measure) => {
 
 tfidf.listTerms(10).forEach((item) => {
 	console.log(item.term, ":", item.tfidf);
-})
+});
+
+// Trie
+// case-sensitive, pass in false to make case-insensitive
+const trie = new natural.Trie();
+
+documents.forEach(doc => {
+	trie.addString(doc);
+});
+
+console.log(trie.contains("Superman"));
+console.log(trie.keysWithPrefix("Zarathustra"));
+console.log(trie.findMatchesOnPath("Zarathustra"));
+
+
+
+
